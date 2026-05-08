@@ -4,10 +4,10 @@ import type { Itinerary } from '../types/itinerary';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY || '');
 const model = genAI.getGenerativeModel({
-  model: 'gemini-pro',
+  model: 'gemini-2.5-flash',
   generationConfig: {
     temperature: 0.7,
-    maxOutputTokens: 4096,
+    maxOutputTokens: 8192,
   }
 });
 
