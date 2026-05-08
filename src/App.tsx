@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import HomePage from './components/HomePage';
-import LoadingScreen from './components/LoadingScreen';
+import StreamingItinerary from './components/StreamingItinerary';
 import ItineraryDisplay from './components/ItineraryDisplay';
 import type { Itinerary } from './types/itinerary';
 
@@ -19,42 +19,43 @@ const theme = createTheme({
 });
 
 function App() {
-  const [view, setView] = useState<'home' | 'loading' | 'itinerary'>('home');
+  const [view, setView] = useState<'home' | 'streaming' | 'itinerary'>('home');
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [streamedText, setStreamedText] = useState('');
 
   const handleItineraryGenerated = (newItinerary: Itinerary) => {
     setItinerary(newItinerary);
     setView('itinerary');
-    setIsLoading(false);
   };
 
-  const handleStartLoading = () => {
-    setIsLoading(true);
+  const handleStartStreaming = () => {
+    setView('streaming');
+    setStreamedText('');
+  };
+
+  const handleStreamProgress = (text: string) => {
+    setStreamedText(text);
   };
 
   const handleReset = () => {
     setItinerary(null);
+    setStreamedText('');
     setView('home');
-    setIsLoading(false);
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', margin: 0, padding: 0, width: '100%' }}>
-        <Box sx={{ display: view === 'home' ? 'block' : 'none' }}>
+        {view === 'home' && (
           <HomePage
             onItineraryGenerated={handleItineraryGenerated}
-            onStartLoading={handleStartLoading}
+            onStartStreaming={handleStartStreaming}
+            onStreamProgress={handleStreamProgress}
           />
-        </Box>
-
-        {isLoading && (
-          <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
-            <LoadingScreen />
-          </Box>
         )}
+
+        {view === 'streaming' && <StreamingItinerary streamedText={streamedText} />}
 
         {view === 'itinerary' && itinerary && (
           <Box sx={{ py: 4 }}>

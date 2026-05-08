@@ -11,7 +11,10 @@ const model = genAI.getGenerativeModel({
   }
 });
 
-export async function generateItinerary(input: TripInput): Promise<Itinerary> {
+export async function generateItinerary(
+  input: TripInput,
+  onProgress?: (text: string) => void
+): Promise<Itinerary> {
   console.log('Starting API call with input:', input);
   console.log('API Key available:', !!import.meta.env.VITE_GOOGLE_API_KEY);
 
@@ -87,36 +90,36 @@ Return ONLY valid JSON matching this structure:
   "budgetStatus": "under" | "over" | "exact"
 }`;
 
-  console.log('Sending prompt to Gemini API...');
+  console.log('Sending prompt to Gemini API with streaming...');
 
   try {
-    // Add timeout wrapper
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('API request timed out after 60 seconds')), 60000);
-    });
+    const result = await model.generateContentStream(prompt);
 
-    const apiPromise = model.generateContent(prompt);
+    let fullText = '';
 
-    const result = await Promise.race([apiPromise, timeoutPromise]) as any;
-    console.log('Received response from Gemini API');
+    // Stream the response
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      fullText += chunkText;
 
-    const response = result.response;
-    const responseText = response.text();
-    console.log('Response text length:', responseText.length);
-    console.log('Full response text:', responseText);
+      // Call progress callback with accumulated text
+      if (onProgress) {
+        onProgress(fullText);
+      }
+    }
+
+    console.log('Streaming complete. Full response length:', fullText.length);
+    console.log('Full response text:', fullText);
 
     // Extract JSON from response (handle markdown code blocks)
-    const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);
-    const jsonString = jsonMatch ? jsonMatch[1] : responseText;
+    const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || fullText.match(/(\{[\s\S]*\})/);
+    const jsonString = jsonMatch ? jsonMatch[1] : fullText;
 
     console.log('Extracted JSON length:', jsonString.length);
-    console.log('JSON to parse:', jsonString);
 
     // Try to fix common JSON issues
     let cleanedJson = jsonString
       .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
-      .replace(/\n/g, ' ') // Remove newlines
-      .replace(/\r/g, '') // Remove carriage returns
       .trim();
 
     try {

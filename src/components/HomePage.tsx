@@ -32,7 +32,8 @@ import type { Itinerary } from '../types/itinerary';
 
 interface Props {
   onItineraryGenerated: (itinerary: Itinerary) => void;
-  onStartLoading: () => void;
+  onStartStreaming: () => void;
+  onStreamProgress: (text: string) => void;
 }
 
 const destinations = [
@@ -85,7 +86,7 @@ const deals = [
   },
 ];
 
-export default function HomePage({ onItineraryGenerated, onStartLoading }: Props) {
+export default function HomePage({ onItineraryGenerated, onStartStreaming, onStreamProgress }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<TripInput>({
@@ -152,25 +153,15 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
 
       console.log('Submitting form with data:', updatedFormData);
 
-      // Show loading screen
-      onStartLoading();
+      // Start streaming
+      onStartStreaming();
 
-      // Start timing for minimum loading screen duration
-      const startTime = Date.now();
-      const minLoadingTime = 8000; // 8 seconds minimum
-
-      console.log('Calling generateItinerary...');
-      const itinerary = await generateItinerary(updatedFormData);
-      console.log('Got itinerary:', itinerary);
-
-      // Ensure loading screen shows for at least minimum time
-      const elapsed = Date.now() - startTime;
-      const remainingTime = Math.max(0, minLoadingTime - elapsed);
-
-      if (remainingTime > 0) {
-        console.log(`Waiting ${remainingTime}ms more for minimum loading time`);
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
-      }
+      console.log('Calling generateItinerary with streaming...');
+      const itinerary = await generateItinerary(updatedFormData, (text) => {
+        console.log('Stream progress, length:', text.length);
+        onStreamProgress(text);
+      });
+      console.log('Got complete itinerary:', itinerary);
 
       console.log('Calling onItineraryGenerated');
       onItineraryGenerated(itinerary);
