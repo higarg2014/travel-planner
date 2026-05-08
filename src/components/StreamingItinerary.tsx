@@ -1,41 +1,68 @@
-import { Box, Container, Paper, Typography } from '@mui/material';
-import ReactMarkdown from 'react-markdown';
+import { Box, Container, Paper, Typography, CircularProgress } from '@mui/material';
 
 interface Props {
   streamedText: string;
 }
 
 export default function StreamingItinerary({ streamedText }: Props) {
+  // Extract only the text before any JSON code block
+  const displayText = streamedText.split('```')[0] || streamedText;
+
+  // Simple parsing to show progress
+  const lines = displayText.split('\n').filter(line => line.trim());
+
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 4 }}>
       <Container maxWidth="lg">
         <Paper elevation={10} sx={{ p: 4, borderRadius: 4, minHeight: '70vh' }}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#667eea', mb: 3 }}>
-            ✨ Generating Your Perfect Trip...
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <CircularProgress size={60} sx={{ color: '#667eea', mb: 2 }} />
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#667eea' }}>
+              ✨ Crafting Your Perfect Trip...
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              AI is analyzing the best flights, hotels, and activities for you
+            </Typography>
+          </Box>
 
           <Box
             sx={{
-              '& h1, & h2, & h3': { color: '#667eea', fontWeight: 'bold', mt: 3, mb: 2 },
-              '& p': { mb: 2, lineHeight: 1.8 },
-              '& ul, & ol': { pl: 3, mb: 2 },
-              '& li': { mb: 1 },
-              '& code': {
-                bgcolor: 'rgba(102, 126, 234, 0.1)',
-                px: 1,
-                py: 0.5,
-                borderRadius: 1,
-                fontFamily: 'monospace',
-              },
-              '& pre': {
-                bgcolor: 'rgba(102, 126, 234, 0.05)',
-                p: 2,
-                borderRadius: 2,
-                overflow: 'auto',
-              },
+              maxHeight: '60vh',
+              overflowY: 'auto',
+              '& > *': { mb: 1.5 },
             }}
           >
-            <ReactMarkdown>{streamedText || 'Starting...'}</ReactMarkdown>
+            {lines.length > 0 ? (
+              lines.map((line, index) => {
+                const isHeading = line.startsWith('#');
+                const isBullet = line.trim().startsWith('*') || line.trim().startsWith('-');
+
+                return (
+                  <Typography
+                    key={index}
+                    variant={isHeading ? 'h6' : 'body1'}
+                    sx={{
+                      color: isHeading ? '#667eea' : 'text.primary',
+                      fontWeight: isHeading ? 'bold' : 'normal',
+                      pl: isBullet ? 3 : 0,
+                      opacity: 0,
+                      animation: 'fadeIn 0.3s forwards',
+                      animationDelay: `${index * 0.05}s`,
+                      '@keyframes fadeIn': {
+                        from: { opacity: 0, transform: 'translateY(10px)' },
+                        to: { opacity: 1, transform: 'translateY(0)' },
+                      },
+                    }}
+                  >
+                    {line.replace(/^#+\s*/, '').replace(/^\*\s*/, '• ').replace(/^-\s*/, '• ')}
+                  </Typography>
+                );
+              })
+            ) : (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                Starting AI generation...
+              </Typography>
+            )}
           </Box>
 
           {/* Blinking cursor effect */}

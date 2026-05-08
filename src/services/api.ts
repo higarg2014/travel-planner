@@ -112,15 +112,34 @@ Return ONLY valid JSON matching this structure:
     console.log('Full response text:', fullText);
 
     // Extract JSON from response (handle markdown code blocks)
-    const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || fullText.match(/(\{[\s\S]*\})/);
-    const jsonString = jsonMatch ? jsonMatch[1] : fullText;
+    let jsonString = fullText;
+
+    // Try to extract from markdown code block first
+    const codeBlockMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch) {
+      jsonString = codeBlockMatch[1];
+    } else {
+      // Try to extract just the JSON object
+      const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[0];
+      }
+    }
 
     console.log('Extracted JSON length:', jsonString.length);
+    console.log('First 500 chars of JSON:', jsonString.substring(0, 500));
 
-    // Try to fix common JSON issues
+    // Aggressive JSON cleaning
     let cleanedJson = jsonString
-      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas before } or ]
+      .replace(/,(\s*,)/g, ',') // Remove duplicate commas
+      .replace(/\n/g, ' ') // Remove newlines
+      .replace(/\r/g, '') // Remove carriage returns
+      .replace(/\t/g, ' ') // Replace tabs with spaces
+      .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
       .trim();
+
+    console.log('Cleaned JSON length:', cleanedJson.length);
 
     try {
       const itinerary: Itinerary = JSON.parse(cleanedJson);
@@ -128,8 +147,21 @@ Return ONLY valid JSON matching this structure:
       return itinerary;
     } catch (parseError) {
       console.error('Failed to parse JSON:', parseError);
-      console.error('Problematic JSON:', cleanedJson.substring(0, 1000));
-      throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      console.error('Problematic JSON (first 2000 chars):', cleanedJson.substring(0, 2000));
+      console.error('Problematic JSON (around error position 629):', cleanedJson.substring(600, 700));
+
+      // Try one more time with even more aggressive cleaning
+      try {
+        const superCleanedJson = cleanedJson
+          .replace(/,\s*}/g, '}') // Remove trailing commas before }
+          .replace(/,\s*]/g, ']'); // Remove trailing commas before ]
+
+        const itinerary: Itinerary = JSON.parse(superCleanedJson);
+        console.log('Successfully parsed with super cleaning:', itinerary);
+        return itinerary;
+      } catch (secondError) {
+        throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      }
     }
   } catch (error) {
     console.error('Error in generateItinerary:', error);
