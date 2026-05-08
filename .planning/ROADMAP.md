@@ -28,7 +28,10 @@ Users can instantly generate complete, personalized multi-day trip itineraries (
   1. React app runs locally with Vite dev server and Material-UI installed
   2. Form displays fields for: destination, check-in/check-out dates, number of travelers, budget, preferences (activities, hotel type, food preferences)
   3. User can submit form and see loading state
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md — Setup React app with Material-UI and create trip input form
 **Time estimate**: 25 minutes
 
 ### Phase 2: AI Itinerary Generation
