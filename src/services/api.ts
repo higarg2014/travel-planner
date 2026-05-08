@@ -103,17 +103,31 @@ Return ONLY valid JSON matching this structure:
     const response = result.response;
     const responseText = response.text();
     console.log('Response text length:', responseText.length);
-    console.log('First 200 chars:', responseText.substring(0, 200));
+    console.log('Full response text:', responseText);
 
     // Extract JSON from response (handle markdown code blocks)
     const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);
     const jsonString = jsonMatch ? jsonMatch[1] : responseText;
 
     console.log('Extracted JSON length:', jsonString.length);
-    const itinerary: Itinerary = JSON.parse(jsonString);
-    console.log('Successfully parsed itinerary:', itinerary);
+    console.log('JSON to parse:', jsonString);
 
-    return itinerary;
+    // Try to fix common JSON issues
+    let cleanedJson = jsonString
+      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      .replace(/\n/g, ' ') // Remove newlines
+      .replace(/\r/g, '') // Remove carriage returns
+      .trim();
+
+    try {
+      const itinerary: Itinerary = JSON.parse(cleanedJson);
+      console.log('Successfully parsed itinerary:', itinerary);
+      return itinerary;
+    } catch (parseError) {
+      console.error('Failed to parse JSON:', parseError);
+      console.error('Problematic JSON:', cleanedJson.substring(0, 1000));
+      throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+    }
   } catch (error) {
     console.error('Error in generateItinerary:', error);
     if (error instanceof Error) {
