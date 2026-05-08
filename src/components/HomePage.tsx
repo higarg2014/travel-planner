@@ -277,17 +277,17 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
             </Stack>
           </Container>
 
-          {/* Sticky Search Form Overlay */}
+          {/* Search Form Overlay */}
           {showForm && (
             <Box
               sx={{
-                position: 'fixed',
-                top: 20,
+                position: 'absolute',
+                top: '50%',
                 left: '50%',
-                transform: 'translateX(-50%)',
+                transform: 'translate(-50%, -50%)',
                 zIndex: 1000,
                 width: { xs: '95%', sm: '90%', md: '800px' },
-                maxHeight: 'calc(100vh - 40px)',
+                maxHeight: '90vh',
                 overflowY: 'auto',
               }}
             >
