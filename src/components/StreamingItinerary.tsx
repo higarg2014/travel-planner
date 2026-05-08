@@ -1,86 +1,97 @@
-import { Box, Container, Paper, Typography, CircularProgress } from '@mui/material';
+import { Box, Container, Paper, Typography, CircularProgress, Stack } from '@mui/material';
+import { Flight, Hotel, Restaurant, LocalActivity } from '@mui/icons-material';
 
 interface Props {
   streamedText: string;
 }
 
-export default function StreamingItinerary({ streamedText }: Props) {
-  // Extract only the text before any JSON code block
-  const displayText = streamedText.split('```')[0] || streamedText;
+const loadingSteps = [
+  { icon: Flight, text: 'Finding best flight options...' },
+  { icon: Hotel, text: 'Selecting perfect accommodations...' },
+  { icon: Restaurant, text: 'Discovering local restaurants...' },
+  { icon: LocalActivity, text: 'Planning exciting activities...' },
+];
 
-  // Simple parsing to show progress
-  const lines = displayText.split('\n').filter(line => line.trim());
+export default function StreamingItinerary({ streamedText }: Props) {
+  // Calculate progress based on streamed text length
+  const progress = Math.min(Math.floor((streamedText.length / 3000) * 100), 95);
+  const currentStepIndex = Math.floor((progress / 100) * loadingSteps.length);
 
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 4 }}>
-      <Container maxWidth="lg">
-        <Paper elevation={10} sx={{ p: 4, borderRadius: 4, minHeight: '70vh' }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <CircularProgress size={60} sx={{ color: '#667eea', mb: 2 }} />
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper elevation={10} sx={{ p: 6, borderRadius: 4, textAlign: 'center' }}>
+          <Box sx={{ mb: 4 }}>
+            <CircularProgress
+              variant="determinate"
+              value={progress}
+              size={80}
+              thickness={4}
+              sx={{
+                color: '#667eea',
+                mb: 3,
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round',
+                }
+              }}
+            />
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#667eea' }}>
-              ✨ Crafting Your Perfect Trip...
+              Creating Your Itinerary
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              AI is analyzing the best flights, hotels, and activities for you
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
+              {progress}% Complete
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              maxHeight: '60vh',
-              overflowY: 'auto',
-              '& > *': { mb: 1.5 },
-            }}
-          >
-            {lines.length > 0 ? (
-              lines.map((line, index) => {
-                const isHeading = line.startsWith('#');
-                const isBullet = line.trim().startsWith('*') || line.trim().startsWith('-');
+          <Stack spacing={2} sx={{ mb: 4 }}>
+            {loadingSteps.map((step, index) => {
+              const StepIcon = step.icon;
+              const isActive = index === currentStepIndex;
+              const isComplete = index < currentStepIndex;
 
-                return (
-                  <Typography
-                    key={index}
-                    variant={isHeading ? 'h6' : 'body1'}
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                    opacity: isComplete ? 0.5 : isActive ? 1 : 0.3,
+                    transition: 'opacity 0.3s',
+                  }}
+                >
+                  <StepIcon
                     sx={{
-                      color: isHeading ? '#667eea' : 'text.primary',
-                      fontWeight: isHeading ? 'bold' : 'normal',
-                      pl: isBullet ? 3 : 0,
-                      opacity: 0,
-                      animation: 'fadeIn 0.3s forwards',
-                      animationDelay: `${index * 0.05}s`,
-                      '@keyframes fadeIn': {
-                        from: { opacity: 0, transform: 'translateY(10px)' },
-                        to: { opacity: 1, transform: 'translateY(0)' },
-                      },
+                      fontSize: 30,
+                      color: isComplete ? 'success.main' : isActive ? 'primary.main' : 'text.secondary',
+                    }}
+                  />
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      color: isActive ? 'text.primary' : 'text.secondary',
                     }}
                   >
-                    {line.replace(/^#+\s*/, '').replace(/^\*\s*/, '• ').replace(/^-\s*/, '• ')}
+                    {step.text}
                   </Typography>
-                );
-              })
-            ) : (
-              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                Starting AI generation...
-              </Typography>
-            )}
-          </Box>
+                </Box>
+              );
+            })}
+          </Stack>
 
-          {/* Blinking cursor effect */}
-          <Box
-            component="span"
-            sx={{
-              display: 'inline-block',
-              width: '3px',
-              height: '20px',
-              bgcolor: '#667eea',
-              ml: 1,
-              animation: 'blink 1s infinite',
-              '@keyframes blink': {
-                '0%, 49%': { opacity: 1 },
-                '50%, 100%': { opacity: 0 },
-              },
-            }}
-          />
+          <Typography variant="caption" color="text.secondary">
+            Powered by Google Gemini AI
+          </Typography>
         </Paper>
       </Container>
     </Box>
