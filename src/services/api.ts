@@ -6,6 +6,9 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 export async function generateItinerary(input: TripInput): Promise<Itinerary> {
+  console.log('Starting API call with input:', input);
+  console.log('API Key available:', !!import.meta.env.VITE_GOOGLE_API_KEY);
+
   const checkInDate = input.checkIn ? new Date(input.checkIn) : new Date();
   const checkOutDate = input.checkOut ? new Date(input.checkOut) : new Date();
   const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -78,15 +81,26 @@ Return ONLY valid JSON matching this structure:
   "budgetStatus": "under" | "over" | "exact"
 }`;
 
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  const responseText = response.text();
+  console.log('Sending prompt to Gemini API...');
 
-  // Extract JSON from response (handle markdown code blocks)
-  const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);
-  const jsonString = jsonMatch ? jsonMatch[1] : responseText;
+  try {
+    const result = await model.generateContent(prompt);
+    console.log('Received response from Gemini API');
 
-  const itinerary: Itinerary = JSON.parse(jsonString);
+    const response = result.response;
+    const responseText = response.text();
+    console.log('Response text length:', responseText.length);
 
-  return itinerary;
+    // Extract JSON from response (handle markdown code blocks)
+    const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);
+    const jsonString = jsonMatch ? jsonMatch[1] : responseText;
+
+    const itinerary: Itinerary = JSON.parse(jsonString);
+    console.log('Successfully parsed itinerary:', itinerary);
+
+    return itinerary;
+  } catch (error) {
+    console.error('Error in generateItinerary:', error);
+    throw error;
+  }
 }

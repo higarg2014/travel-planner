@@ -150,6 +150,8 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
         },
       };
 
+      console.log('Submitting form with data:', updatedFormData);
+
       // Show loading screen
       onStartLoading();
 
@@ -157,20 +159,24 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
       const startTime = Date.now();
       const minLoadingTime = 8000; // 8 seconds minimum
 
+      console.log('Calling generateItinerary...');
       const itinerary = await generateItinerary(updatedFormData);
+      console.log('Got itinerary:', itinerary);
 
       // Ensure loading screen shows for at least minimum time
       const elapsed = Date.now() - startTime;
       const remainingTime = Math.max(0, minLoadingTime - elapsed);
 
       if (remainingTime > 0) {
+        console.log(`Waiting ${remainingTime}ms more for minimum loading time`);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
 
+      console.log('Calling onItineraryGenerated');
       onItineraryGenerated(itinerary);
     } catch (err) {
       console.error('Error generating itinerary:', err);
-      setError('Failed to generate itinerary. Please check your Google API key and try again.');
+      setError(`Failed to generate itinerary: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setLoading(false);
     }
   };
