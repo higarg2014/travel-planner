@@ -3,7 +3,13 @@ import type { TripInput } from '../types/trip';
 import type { Itinerary } from '../types/itinerary';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+const model = genAI.getGenerativeModel({
+  model: 'gemini-1.5-flash',
+  generationConfig: {
+    temperature: 0.7,
+    maxOutputTokens: 4096,
+  }
+});
 
 export async function generateItinerary(input: TripInput): Promise<Itinerary> {
   console.log('Starting API call with input:', input);
@@ -84,23 +90,36 @@ Return ONLY valid JSON matching this structure:
   console.log('Sending prompt to Gemini API...');
 
   try {
-    const result = await model.generateContent(prompt);
+    // Add timeout wrapper
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('API request timed out after 60 seconds')), 60000);
+    });
+
+    const apiPromise = model.generateContent(prompt);
+
+    const result = await Promise.race([apiPromise, timeoutPromise]) as any;
     console.log('Received response from Gemini API');
 
     const response = result.response;
     const responseText = response.text();
     console.log('Response text length:', responseText.length);
+    console.log('First 200 chars:', responseText.substring(0, 200));
 
     // Extract JSON from response (handle markdown code blocks)
     const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);
     const jsonString = jsonMatch ? jsonMatch[1] : responseText;
 
+    console.log('Extracted JSON length:', jsonString.length);
     const itinerary: Itinerary = JSON.parse(jsonString);
     console.log('Successfully parsed itinerary:', itinerary);
 
     return itinerary;
   } catch (error) {
     console.error('Error in generateItinerary:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     throw error;
   }
 }
