@@ -320,15 +320,15 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 zIndex: 1000,
-                width: { xs: '95%', sm: '90%', md: '800px' },
-                maxHeight: '90vh',
+                width: { xs: '95%', sm: '95%', md: '1000px' },
+                maxHeight: '95vh',
                 overflowY: 'auto',
               }}
             >
               <Paper
                 elevation={24}
                 sx={{
-                  p: 4,
+                  p: { xs: 3, md: 5 },
                   borderRadius: 4,
                   background: 'rgba(255, 255, 255, 0.98)',
                   backdropFilter: 'blur(10px)',
