@@ -12,9 +12,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.95.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@google/generative-ai": "^0.24.1",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@mui/x-date-pickers": "^9.0.4",

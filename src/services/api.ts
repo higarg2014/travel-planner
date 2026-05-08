@@ -1,11 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { TripInput } from '../types/trip';
 import type { Itinerary } from '../types/itinerary';
 
-const client = new Anthropic({
-  apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
-  dangerouslyAllowBrowser: true // For demo purposes only
-});
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
 export async function generateItinerary(input: TripInput): Promise<Itinerary> {
   const checkInDate = input.checkIn ? new Date(input.checkIn) : new Date();
@@ -80,18 +78,9 @@ Return ONLY valid JSON matching this structure:
   "budgetStatus": "under" | "over" | "exact"
 }`;
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
-    messages: [
-      {
-        role: 'user',
-        content: prompt
-      }
-    ]
-  });
-
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  const responseText = response.text();
 
   // Extract JSON from response (handle markdown code blocks)
   const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || responseText.match(/(\{[\s\S]*\})/);

@@ -50,7 +50,7 @@ export default function TripInputForm({ onItineraryGenerated }: Props) {
       onItineraryGenerated(itinerary);
     } catch (err) {
       console.error('Error generating itinerary:', err);
-      setError('Failed to generate itinerary. Please check your API key and try again.');
+      setError('Failed to generate itinerary. Please check your Google API key and try again.');
       setLoading(false);
     }
   };
