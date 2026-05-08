@@ -151,22 +151,14 @@ export default function HomePage({ onItineraryGenerated, onStartStreaming, onStr
         },
       };
 
-      console.log('Submitting form with data:', updatedFormData);
-
-      // Start streaming
       onStartStreaming();
 
-      console.log('Calling generateItinerary with streaming...');
       const itinerary = await generateItinerary(updatedFormData, (text) => {
-        console.log('Stream progress, length:', text.length);
         onStreamProgress(text);
       });
-      console.log('Got complete itinerary:', itinerary);
 
-      console.log('Calling onItineraryGenerated');
       onItineraryGenerated(itinerary);
     } catch (err) {
-      console.error('Error generating itinerary:', err);
       setError(`Failed to generate itinerary: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setLoading(false);
     }

@@ -15,9 +15,6 @@ export async function generateItinerary(
   input: TripInput,
   onProgress?: (text: string) => void
 ): Promise<Itinerary> {
-  console.log('Starting API call with input:', input);
-  console.log('API Key available:', !!import.meta.env.VITE_GOOGLE_API_KEY);
-
   const checkInDate = input.checkIn ? new Date(input.checkIn) : new Date();
   const checkOutDate = input.checkOut ? new Date(input.checkOut) : new Date();
   const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -90,85 +87,56 @@ Return ONLY valid JSON matching this structure:
   "budgetStatus": "under" | "over" | "exact"
 }`;
 
-  console.log('Sending prompt to Gemini API with streaming...');
-
   try {
     const result = await model.generateContentStream(prompt);
-
     let fullText = '';
 
-    // Stream the response
     for await (const chunk of result.stream) {
       const chunkText = chunk.text();
       fullText += chunkText;
 
-      // Call progress callback with accumulated text
       if (onProgress) {
         onProgress(fullText);
       }
     }
 
-    console.log('Streaming complete. Full response length:', fullText.length);
-    console.log('Full response text:', fullText);
-
-    // Extract JSON from response (handle markdown code blocks)
     let jsonString = fullText;
 
-    // Try to extract from markdown code block first
     const codeBlockMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
     if (codeBlockMatch) {
       jsonString = codeBlockMatch[1];
     } else {
-      // Try to extract just the JSON object
       const jsonMatch = fullText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         jsonString = jsonMatch[0];
       }
     }
 
-    console.log('Extracted JSON length:', jsonString.length);
-    console.log('First 500 chars of JSON:', jsonString.substring(0, 500));
-
-    // Aggressive JSON cleaning
     let cleanedJson = jsonString
-      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas before } or ]
-      .replace(/,(\s*,)/g, ',') // Remove duplicate commas
-      .replace(/\n/g, ' ') // Remove newlines
-      .replace(/\r/g, '') // Remove carriage returns
-      .replace(/\t/g, ' ') // Replace tabs with spaces
-      .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
+      .replace(/,(\s*[}\]])/g, '$1')
+      .replace(/,(\s*,)/g, ',')
+      .replace(/\n/g, ' ')
+      .replace(/\r/g, '')
+      .replace(/\t/g, ' ')
+      .replace(/\s{2,}/g, ' ')
       .trim();
-
-    console.log('Cleaned JSON length:', cleanedJson.length);
 
     try {
       const itinerary: Itinerary = JSON.parse(cleanedJson);
-      console.log('Successfully parsed itinerary:', itinerary);
       return itinerary;
     } catch (parseError) {
-      console.error('Failed to parse JSON:', parseError);
-      console.error('Problematic JSON (first 2000 chars):', cleanedJson.substring(0, 2000));
-      console.error('Problematic JSON (around error position 629):', cleanedJson.substring(600, 700));
-
-      // Try one more time with even more aggressive cleaning
       try {
         const superCleanedJson = cleanedJson
-          .replace(/,\s*}/g, '}') // Remove trailing commas before }
-          .replace(/,\s*]/g, ']'); // Remove trailing commas before ]
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']');
 
         const itinerary: Itinerary = JSON.parse(superCleanedJson);
-        console.log('Successfully parsed with super cleaning:', itinerary);
         return itinerary;
       } catch (secondError) {
         throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
       }
     }
   } catch (error) {
-    console.error('Error in generateItinerary:', error);
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
     throw error;
   }
 }
