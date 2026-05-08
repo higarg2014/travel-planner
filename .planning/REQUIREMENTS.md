@@ -104,17 +104,76 @@
 
 ## Traceability
 
-Mapping requirements to roadmap phases (populated during roadmap creation).
+Mapping requirements to roadmap phases. **2-hour hackathon scope:** 12 requirements mapped (critical path), 25 deferred to post-demo.
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| (To be filled during roadmap creation) | | |
+| Requirement | Phase | Status | Note |
+|-------------|-------|--------|------|
+| SETUP-01 | Phase 2 | Pending | Trip input: destination |
+| SETUP-02 | Phase 2 | Pending | Trip input: dates |
+| SETUP-03 | Phase 2 | Pending | Trip input: travelers |
+| SETUP-04 | Phase 2 | Pending | Trip input: budget |
+| FLIGHT-01 | Phase 2 | Pending | View flight options |
+| FLIGHT-02 | Phase 2 | Pending | Flight details display |
+| FLIGHT-03 | Phase 2 | Pending | Select flight |
+| FLIGHT-04 | Phase 2 | Pending | Budget tracker update |
+| HOTEL-01 | Post-demo | Deferred | 2-hour constraint: flights only |
+| HOTEL-02 | Post-demo | Deferred | 2-hour constraint: flights only |
+| HOTEL-03 | Post-demo | Deferred | 2-hour constraint: flights only |
+| HOTEL-04 | Post-demo | Deferred | 2-hour constraint: flights only |
+| CAR-01 | Post-demo | Deferred | 2-hour constraint: flights only |
+| CAR-02 | Post-demo | Deferred | 2-hour constraint: flights only |
+| CAR-03 | Post-demo | Deferred | 2-hour constraint: flights only |
+| CAR-04 | Post-demo | Deferred | 2-hour constraint: flights only |
+| ACTIVITY-01 | Post-demo | Deferred | 2-hour constraint: flights only |
+| ACTIVITY-02 | Post-demo | Deferred | 2-hour constraint: flights only |
+| ACTIVITY-03 | Post-demo | Deferred | 2-hour constraint: flights only |
+| ACTIVITY-04 | Post-demo | Deferred | 2-hour constraint: flights only |
+| NAV-01 | Phase 1 | Pending | Next/Back buttons |
+| NAV-02 | Phase 1 | Pending | Progress indicator |
+| NAV-03 | Post-demo | Deferred | Validation adds complexity |
+| NAV-04 | Post-demo | Deferred | Back-navigation polish |
+| REVIEW-01 | Phase 3 | Pending | Trip summary display |
+| REVIEW-02 | Post-demo | Deferred | Timeline view nice-to-have |
+| REVIEW-03 | Phase 3 | Pending | Cost breakdown |
+| REVIEW-04 | Post-demo | Deferred | Calculated in phase 3 |
+| REVIEW-05 | Post-demo | Deferred | Over-budget alert polish |
+| EXPORT-01 | Post-demo | Deferred | Print view nice-to-have |
+| EXPORT-02 | Post-demo | Deferred | Print view nice-to-have |
+| UI-01 | Phase 1 | Pending | Material-UI components |
+| UI-02 | Phase 3 | Pending | Responsive layout |
+| UI-03 | Post-demo | Deferred | Theme customization time |
+| UI-04 | Post-demo | Deferred | Formatting handled by basic display |
+| API-01 | Post-demo | Deferred | Hardcoded mock data in phase 2 |
+| API-02 | Post-demo | Deferred | Hardcoded mock data in phase 2 |
+| API-03 | Post-demo | Deferred | Not needed (no cars in demo) |
+| API-04 | Post-demo | Deferred | Not needed (no activities in demo) |
+| API-05 | Post-demo | Deferred | Hardcoded mock data in phase 2 |
 
 **Coverage:**
 - v1 requirements: 37 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 37 ⚠️
+- Mapped to phases: 12 (critical path for 2-hour demo)
+- Deferred to post-demo: 25 (hotels, cars, activities, polish, backend)
+- Coverage ratio: 32% (justified by 2-hour constraint)
+
+**Deferred categories:**
+- Hotels: 4 requirements (same pattern as flights, add post-demo)
+- Cars: 4 requirements (same pattern as flights, add post-demo)
+- Activities: 4 requirements (same pattern as flights, add post-demo)
+- Navigation polish: 2 requirements (validation, back-navigation)
+- Review details: 3 requirements (timeline, budget alerts)
+- Export: 2 requirements (print view)
+- UI polish: 2 requirements (theming, formatting)
+- Backend APIs: 5 requirements (using hardcoded data in phase 2)
+
+**Post-demo expansion path:**
+1. Add hotel selection step (reuse flight selection pattern)
+2. Add car rental step (reuse flight selection pattern)
+3. Add activities step (reuse flight selection pattern)
+4. Build backend API with mock data endpoints
+5. Add navigation validation and back-editing
+6. Add export functionality
+7. Add theme and polish
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after initial definition*
+*Last updated: 2026-05-08 after roadmap creation (2-hour hackathon scope applied)*

@@ -14,7 +14,7 @@ Users can instantly generate complete, personalized multi-day trip itineraries (
 
 ## Phases
 
-- [ ] **Phase 1: Project Setup & Input Form** - React app with Material-UI input form for trip requirements
+- [x] **Phase 1: Project Setup & Input Form** - React app with Material-UI input form for trip requirements (completed 2026-05-08)
 - [ ] **Phase 2: AI Itinerary Generation** - Claude API integration to generate complete multi-day itineraries
 - [ ] **Phase 3: Beautiful Display & Polish** - Material-UI timeline/cards showing day-by-day plan with budget tracking
 
@@ -63,7 +63,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Setup & Input Form | 0/TBD | Not started | - |
+| 1. Project Setup & Input Form | 0/TBD | Complete    | 2026-05-08 |
 | 2. AI Itinerary Generation | 0/TBD | Not started | - |
 | 3. Beautiful Display & Polish | 0/TBD | Not started | - |
 
