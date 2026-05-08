@@ -9,14 +9,21 @@ import {
   Paper,
   InputAdornment,
   Stack,
+  Alert,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { TripInput } from '../types/trip';
+import { generateItinerary } from '../services/api';
+import type { Itinerary } from '../types/itinerary';
 
-export default function TripInputForm() {
+interface Props {
+  onItineraryGenerated: (itinerary: Itinerary) => void;
+}
+
+export default function TripInputForm({ onItineraryGenerated }: Props) {
   const [formData, setFormData] = useState<TripInput>({
     destination: '',
     checkIn: null,
@@ -31,16 +38,21 @@ export default function TripInputForm() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log('Form data:', formData);
+    setError(null);
 
-    // Placeholder for Phase 2 API call
-    setTimeout(() => {
+    try {
+      const itinerary = await generateItinerary(formData);
+      onItineraryGenerated(itinerary);
+    } catch (err) {
+      console.error('Error generating itinerary:', err);
+      setError('Failed to generate itinerary. Please check your API key and try again.');
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const isFormValid = () => {
@@ -186,6 +198,13 @@ export default function TripInputForm() {
                   })}
                 />
               </Box>
+
+              {/* Error Alert */}
+              {error && (
+                <Alert severity="error" onClose={() => setError(null)}>
+                  {error}
+                </Alert>
+              )}
 
               {/* Submit Button */}
               <Button
