@@ -100,8 +100,25 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
       foodPreferences: '',
     },
   });
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(['flights', 'hotels', 'activities', 'restaurants']);
+  const [otherRequirements, setOtherRequirements] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const tripOptions = [
+    { id: 'flights', label: 'Flights' },
+    { id: 'hotels', label: 'Hotels' },
+    { id: 'activities', label: 'Activities' },
+    { id: 'restaurants', label: 'Restaurants' },
+  ];
+
+  const toggleOption = (optionId: string) => {
+    setSelectedOptions((prev) =>
+      prev.includes(optionId)
+        ? prev.filter((id) => id !== optionId)
+        : [...prev, optionId]
+    );
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -117,7 +134,24 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
     onStartLoading();
 
     try {
-      const itinerary = await generateItinerary(formData);
+      // Build preferences string based on selected options and other requirements
+      const preferencesText = [
+        selectedOptions.includes('flights') ? 'Include flights' : 'No flights needed',
+        selectedOptions.includes('hotels') ? 'Include hotels' : 'No hotels needed',
+        selectedOptions.includes('activities') ? 'Include activities' : 'No activities needed',
+        selectedOptions.includes('restaurants') ? 'Include restaurants' : 'No restaurants needed',
+        otherRequirements ? `Additional requirements: ${otherRequirements}` : '',
+      ].filter(Boolean).join('. ');
+
+      const updatedFormData = {
+        ...formData,
+        preferences: {
+          ...formData.preferences,
+          activities: preferencesText,
+        },
+      };
+
+      const itinerary = await generateItinerary(updatedFormData);
       onItineraryGenerated(itinerary);
     } catch (err) {
       console.error('Error generating itinerary:', err);
@@ -382,15 +416,38 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
                       />
                     </Box>
 
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                        What do you need?
+                      </Typography>
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                        {tripOptions.map((option) => (
+                          <Chip
+                            key={option.id}
+                            label={option.label}
+                            onClick={() => toggleOption(option.id)}
+                            color={selectedOptions.includes(option.id) ? 'primary' : 'default'}
+                            sx={{
+                              fontWeight: selectedOptions.includes(option.id) ? 'bold' : 'normal',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                transform: 'scale(1.05)',
+                              },
+                              transition: 'all 0.2s',
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
+
                     <TextField
                       fullWidth
-                      label="Activities (Optional)"
-                      placeholder="e.g., museums, hiking, beaches"
-                      value={formData.preferences.activities}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        preferences: { ...formData.preferences, activities: e.target.value }
-                      })}
+                      label="Other Requirements (Optional)"
+                      placeholder="e.g., wheelchair accessible, vegetarian meals, near beach"
+                      value={otherRequirements}
+                      onChange={(e) => setOtherRequirements(e.target.value)}
+                      multiline
+                      rows={2}
                       size="small"
                     />
 
