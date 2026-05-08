@@ -17,18 +17,30 @@ export default function LoadingScreen() {
   useEffect(() => {
     const totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);
     let elapsed = 0;
+    let cycleCount = 0;
 
     const interval = setInterval(() => {
       elapsed += 100;
-      setProgress((elapsed / totalDuration) * 100);
+      const cycleProgress = elapsed % totalDuration;
 
+      // Progress bar goes to 95% max, then holds
+      const maxProgress = 95;
+      const currentProgress = Math.min((elapsed / totalDuration) * 100, maxProgress);
+      setProgress(currentProgress);
+
+      // Cycle through steps continuously
       let accumulatedTime = 0;
       for (let i = 0; i < steps.length; i++) {
         accumulatedTime += steps[i].duration;
-        if (elapsed < accumulatedTime) {
+        if (cycleProgress < accumulatedTime) {
           setCurrentStep(i);
           break;
         }
+      }
+
+      // Check if we completed a full cycle
+      if (elapsed >= totalDuration && cycleProgress < 100) {
+        cycleCount++;
       }
     }, 100);
 

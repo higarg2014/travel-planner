@@ -151,7 +151,20 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
         },
       };
 
+      // Start timing for minimum loading screen duration
+      const startTime = Date.now();
+      const minLoadingTime = 8000; // 8 seconds minimum
+
       const itinerary = await generateItinerary(updatedFormData);
+
+      // Ensure loading screen shows for at least minimum time
+      const elapsed = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsed);
+
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
       onItineraryGenerated(itinerary);
     } catch (err) {
       console.error('Error generating itinerary:', err);
