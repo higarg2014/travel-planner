@@ -131,7 +131,6 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
     e.preventDefault();
     setLoading(true);
     setError(null);
-    onStartLoading();
 
     try {
       // Build preferences string based on selected options and other requirements
@@ -150,6 +149,9 @@ export default function HomePage({ onItineraryGenerated, onStartLoading }: Props
           activities: preferencesText,
         },
       };
+
+      // Show loading screen
+      onStartLoading();
 
       // Start timing for minimum loading screen duration
       const startTime = Date.now();

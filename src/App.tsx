@@ -21,33 +21,40 @@ const theme = createTheme({
 function App() {
   const [view, setView] = useState<'home' | 'loading' | 'itinerary'>('home');
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleItineraryGenerated = (newItinerary: Itinerary) => {
     setItinerary(newItinerary);
     setView('itinerary');
+    setIsLoading(false);
   };
 
   const handleStartLoading = () => {
-    setView('loading');
+    setIsLoading(true);
   };
 
   const handleReset = () => {
     setItinerary(null);
     setView('home');
+    setIsLoading(false);
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', margin: 0, padding: 0, width: '100%' }}>
-        {view === 'home' && (
+        <Box sx={{ display: view === 'home' ? 'block' : 'none' }}>
           <HomePage
             onItineraryGenerated={handleItineraryGenerated}
             onStartLoading={handleStartLoading}
           />
-        )}
+        </Box>
 
-        {view === 'loading' && <LoadingScreen />}
+        {isLoading && (
+          <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+            <LoadingScreen />
+          </Box>
+        )}
 
         {view === 'itinerary' && itinerary && (
           <Box sx={{ py: 4 }}>
