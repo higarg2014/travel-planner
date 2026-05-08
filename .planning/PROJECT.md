@@ -2,11 +2,11 @@
 
 ## What This Is
 
-A web application that helps travelers plan complete trips by building itineraries incrementally. Users input their destination, dates, budget, and preferences, then step through selecting flights, accommodation, car rentals, and activities. The system shows options at different price points and creates a cohesive trip plan that can be saved, modified, and exported.
+An AI-powered travel planning application that instantly generates complete multi-day trip itineraries. Users input their destination, dates, budget, and preferences, then AI (Claude API) creates a full itinerary including flights, hotels, daily activities, and restaurant recommendations with realistic pricing and budget tracking.
 
 ## Core Value
 
-Users can build a complete, personalized trip itinerary by making informed choices at each step, with clear price comparisons to stay within budget.
+Users can instantly generate complete, personalized multi-day trip itineraries powered by AI, with clear pricing for every component and automatic budget tracking.
 
 ## Requirements
 
@@ -16,53 +16,60 @@ Users can build a complete, personalized trip itinerary by making informed choic
 
 ### Active
 
-- [ ] User can input trip requirements (destination, dates, budget, party size, preferences)
-- [ ] User can select flight options with price comparison
-- [ ] User can select accommodation options filtered by travel dates
-- [ ] User can select car rental options based on travel duration
-- [ ] User can select activities and experiences for their destination
-- [ ] User can see their complete itinerary with all selections
-- [ ] User can modify any part of their plan (swap flight, hotel, activities)
-- [ ] User can see total cost across all selections
-- [ ] User can save/export their itinerary
-- [ ] System shows price comparison for options (budget, mid-range, premium)
-- [ ] System displays mock real-time update indicators (price changes, availability)
-- [ ] User can track price changes on selected options (visual mock)
+- [ ] User can input trip requirements (destination, dates, budget, travelers, preferences)
+- [ ] AI generates complete multi-day itinerary with one click
+- [ ] Itinerary includes flights (outbound + return) with prices
+- [ ] Itinerary includes hotels for each night with prices
+- [ ] Itinerary includes daily activities (morning/afternoon/evening) with prices
+- [ ] Itinerary includes restaurant recommendations with estimated costs
+- [ ] User can see complete day-by-day timeline view
+- [ ] User can see total cost breakdown by category
+- [ ] Budget tracker shows remaining budget (visual indicator)
+- [ ] Application is responsive on mobile devices
+- [ ] Application is deployed to Google Cloud
+- [ ] User can generate new itinerary with different inputs
 
 ### Out of Scope
 
-- Real external API integrations — v1 uses mock data only
-- User authentication/accounts — single-session planning for v1
+- Real travel API integrations (Amadeus, Skyscanner) — AI generates realistic mock data
+- User authentication/accounts — single-session generation for v1
 - Actual booking — display only, no payment processing
-- Mobile native apps — web-first approach
+- Itinerary editing — AI generates, user accepts (editing in v2)
+- Multiple itinerary options — single AI-generated result for v1
+- Save/load trips — no database persistence for v1
+- Mobile native apps — responsive web app only
 - Multi-destination trips — single destination for v1
-- Collaborative planning — single user for v1
 
 ## Context
 
-This is a public portfolio project demonstrating full-stack development with React and Node.js. The focus is on building a clean, functional demo that showcases:
-- Dynamic UI that adapts based on user selections
-- Incremental workflow where each choice influences subsequent options
-- Price comparison and budget tracking
-- Mock integration patterns that could connect to real APIs later
+This is a 2-hour hackathon project demonstrating AI-powered travel planning. The focus is on building an impressive demo that showcases:
+- AI integration (Claude API) for content generation
+- Complete multi-day itinerary generation
+- Beautiful Material-UI interface with timeline/card displays
+- Budget tracking and cost breakdown
+- Responsive design
+- Google Cloud deployment
 
-Initial version uses mock data to prove the concept and user experience without dependency on external travel APIs.
+AI approach is faster to build and more impressive than manual step-by-step flows, making it ideal for hackathon timeline.
 
 ## Constraints
 
-- **Tech Stack**: React (frontend), Node.js (backend), Google Cloud (deployment) — required
-- **Data Sources**: Mock data only for v1 — no external API dependencies
-- **Scope**: Working demo flow — not production-ready with accounts/persistence
+- **Timeline**: 2 hours total — hackathon sprint
+- **Tech Stack**: React + Vite + TypeScript + Material-UI (frontend), Claude API (AI), Google Cloud (deployment)
+- **AI**: Claude API for itinerary generation — realistic but mock pricing
+- **Scope**: Working demo with AI generation — not production-ready with accounts/persistence
 - **Public Project**: No proprietary or company-specific integrations (e.g., no Expedia-specific code)
+- **Deployment**: Must deploy to your personal Google Cloud account
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Incremental builder flow | Users pick flight → hotel → car → activities in sequence, each step filtered by previous choices | — Pending |
-| Mock data with realistic structure | Build full integration patterns but use local mock data to avoid API costs and dependencies | — Pending |
-| Visual-only real-time updates | Show update UI elements without actual polling/refresh logic to demonstrate concept | — Pending |
-| Single-destination trips for v1 | Reduces complexity in itinerary building and data management | — Pending |
+| AI-powered generation vs manual builder | AI creates complete itineraries faster, more impressive for 2-hour timeline, shows full vision immediately | — Pending |
+| Claude API direct from frontend | No backend needed for hackathon, simplifies deployment, direct API calls | — Pending |
+| Material-UI for all components | Pre-built professional components save time, responsive by default, timeline/card layouts perfect for itineraries | — Pending |
+| Single-destination trips for v1 | Reduces complexity in itinerary building and AI prompt engineering | — Pending |
+| Google Cloud Run deployment | Containerized deployment, auto-scaling, simple setup for React apps | — Pending |
 
 ---
 *Last updated: 2026-05-08 after initialization*
